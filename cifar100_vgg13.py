@@ -5,7 +5,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 tf.random.set_seed(2345)
 
-regular_param = 0.0005
+regular_param = 0.0001
 
 def create_model():
     vgg_layers = [
