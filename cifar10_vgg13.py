@@ -77,7 +77,7 @@ def create_model():
         layers.BatchNormalization(),
         layers.Activation('relu'),
         layers.Dropout(0.5),
-        layers.Dense(100, activation=None),
+        layers.Dense(10, activation=None),
     ]
     vgg13 = Sequential(vgg_layers)
     # vgg13.build(input_shape=[None,32,32,3])
@@ -104,6 +104,13 @@ def cifar100_data(batchsz=64, shufflesz=1000,valid_p=0.2):
     db_train = data.skip(int(valid_p*x.shape[0])).map(preprocess).shuffle(shufflesz).batch(batchsz)
     return db_train, db_valid
 
+def cifar10_data(batchsz=64, shufflesz=1000,valid_p=0.2):
+    (x, y), _ = datasets.cifar10.load_data()
+    y = tf.squeeze(y, axis=1)
+    data = tf.data.Dataset.from_tensor_slices((x, y))
+    db_valid=data.take(int(valid_p*x.shape[0])).map(preprocess).shuffle(shufflesz).batch(batchsz)
+    db_train = data.skip(int(valid_p*x.shape[0])).map(preprocess).shuffle(shufflesz).batch(batchsz)
+    return db_train, db_valid
 
 def compute_loss(logits, labels):
     return tf.reduce_mean(tf.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True))
@@ -147,7 +154,7 @@ def train(epoch, model, optimizer, train_ds, valid_ds):
 
 
 def main():
-    train_ds, valid_ds = cifar100_data()
+    train_ds, valid_ds = cifar10_data()
     model, optimizer = create_model()
     for epoch in range(50):
         loss, accuracy, acc_valid= train(epoch, model, optimizer, train_ds, valid_ds)
